@@ -112,9 +112,11 @@ class Graph
 
         }
 
+        void isInQueue()
+
 
     void prims(int source){
-    int weight;
+    int weight, nd, smallest = MX;
     Node * tmp= a[source].head;
 
      queue < int > Q;
@@ -131,12 +133,35 @@ class Graph
 
     }
 
-    key[source] =0;
+    key[source] = 0;
     parent[source]= NULL;
 
      while(!Q.empty()){
-        weight = tmp->w;
+       // weight = tmp->w;
+       for(int i=0; i<v; i++){
+       if(key[i] < smallest){
+        smallest = key[i];
+        nd = i;
+       }
+       }
+        Node * tmp = a[nd].head;
+         while(tmp != NULL){
+              int next = tmp->data;
+              //
+              for( auto i: Q ){
 
+
+              }
+              if (vis[next] == 0){
+                vis[next] = 1; // visit
+                dist[next] = dist[node] + 1; // update
+                Q.push(next); // push to queue
+
+            }
+            tmp = tmp->next;
+        }
+
+//
         int nd = Q.front();
         key[nd] = MX;
         Q.pop();
