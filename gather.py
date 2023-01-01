@@ -4,6 +4,13 @@ Created on Wed Dec 14 18:25:37 2022
 
 @author: user
 """
+
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec 14 18:25:37 2022
+
+@author: user
+"""
 import numpy as  np
 from PIL import Image
 import os
@@ -34,6 +41,7 @@ def process_images(imagePaths, maskPaths):
         
         if(maskRed>250 and maskGreen>250 and maskBlue>250):
           nonskinPixelNumber[red][green][blue] += 1
+         
         else:
           skinPixelNumber[red][green][blue] += 1
     print('image no: ' + str(i) + ' processed!')
@@ -51,22 +59,22 @@ def process_images(imagePaths, maskPaths):
 def calculate_probability(skin, non_skin):
     skin_count = np.sum(skin)
     non_skin_count = np.sum(non_skin)
-    skin /= skin_count
-    non_skin /= non_skin_count
-    skin_probability = np.zeros((256, 256, 256))
+    skin_probability = skin/ skin_count
+    non_skin_probability =non_skin / non_skin_count
+    threshold = np.zeros((256, 256, 256))
 
     for i in range(256):
         for j in range(256):
             for k in range(256):
-                if non_skin[i][j][k] == 0.0 and skin[i][j][k] == 0.0 :
-                    skin_probability[i][j][k] = 0.0
-                elif non_skin[i][j][k] == 0.0 and skin[i][j][k] != 0.0 :
-                    skin_probability[i][j][k] = skin[i][j][k]
+                if non_skin_probability[i][j][k] == 0.0 and skin_probability[i][j][k] == 0.0 :
+                    threshold[i][j][k] = 0.0
+                elif non_skin_probability[i][j][k] == 0.0 and skin_probability[i][j][k] != 0.0 :
+                    threshold[i][j][k] = skin_probability[i][j][k]
                 else:
-                    skin_probability[i][j][k] = skin[i][j][k] / non_skin[i][j][k]
+                    threshold[i][j][k] = skin_probability[i][j][k] / non_skin_probability[i][j][k]
     #skin_probability = p * np.divide(skin, np.add(skin, non_skin))
 
-    return skin_probability
+    return threshold
 
 def probability_file(skin_probability):
     out = open('probability.txt', 'w')
@@ -89,10 +97,9 @@ if __name__=='__main__':
 
   # skinPixelNumber = [[[0 for k in range(256)] for j in range(256)] for i in range(256)]
   # nonskinPixelNumber = [[[0 for k in range(256)] for j in range(256)] for i in range(256)]
-  skinPixelNumber = np.zeros((256, 256, 256), dtype=np.int32)
-  nonskinPixelNumber = np.zeros((256, 256, 256), dtype=np.int32)
+  skinPixelNumber = np.zeros((256, 256, 256), dtype=np.float64)
+  nonskinPixelNumber = np.zeros((256, 256, 256), dtype=np.float64)
 
   process_images(imagePaths, maskPaths)
   skin_probability = calculate_probability(skinPixelNumber, nonskinPixelNumber)
   probability_file(skin_probability)
-
